@@ -2,10 +2,10 @@ import winston, { transports } from "winston";
 
 const { format, createLogger } = winston;
 
-const { colorize, printf, label, timestamp, prettyPrint } = format;
+const { colorize, printf, label, timestamp } = format;
 
 const PrintFormat = printf(({ level, message, label, timestamp }) => {
- return `${timestamp}-${level}: [${label}] ${message}`;
+ return `${timestamp}-${level}: ${message}`;
 });
 //transports.ConsoleTransportInstance
 let listOfTransports: (transports.FileTransportInstance | transports.ConsoleTransportInstance)[] = [
@@ -22,7 +22,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const logger = createLogger({
- format: format.combine(timestamp(), colorize(), label(), PrintFormat, prettyPrint()),
+ format: format.combine(timestamp(), colorize(), label(), PrintFormat),
  transports: listOfTransports,
  exceptionHandlers: exceptionTransports,
  exitOnError: false,

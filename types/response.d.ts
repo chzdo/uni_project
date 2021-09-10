@@ -5,8 +5,9 @@ interface errResponseObjectType {
 }
 
 interface successResponseObjectType {
- success: boolean;
- payload: Record<string, unknown>;
+ success: boolean | true;
+ // eslint-disable-next-line @typescript-eslint/ban-types
+ payload: Record<string, unknown> | Record<string, unknown>[] | string | Record<string, never> | object;
  statusCode: number;
 }
 

@@ -1,20 +1,47 @@
-import { DataTypes } from "sequelize/types";
-import SQlize from "../../databaseEngine/sequelize";
+import { DataTypes } from "sequelize";
+import sequelize from "../../databaseEngine/sequelize";
 import { testModelInstance } from "../../../types/sequelize";
+import { logger } from "../../../utils/winston";
+import * as Sequel from "sequelize";
 
 const testSchema = {
+ id: {
+  type: DataTypes.INTEGER,
+  autoIncrement: true,
+  primaryKey: true,
+ },
+
  firstName: {
   type: DataTypes.STRING,
+  allowNull: false,
  },
- age: {
-  type: DataTypes.SMALLINT,
+ otherName: {
+  type: DataTypes.STRING,
+  allowNull: false,
  },
- createdOn: {
+ dob: {
   type: DataTypes.DATE,
  },
- isActive: {
+ address: {
+  type: DataTypes.STRING,
+ },
+ isDeleted: {
   type: DataTypes.BOOLEAN,
+  defaultValue: false,
  },
 };
+let TestModel: Sequel.ModelCtor<testModelInstance>;
+try {
+ TestModel = sequelize.define<testModelInstance>("testModels", testSchema, {
+  tableName: "testModels",
+  freezeTableName: true,
+ });
+} catch (e) {
+ logger.error(e);
+}
 
-export default SQlize.define<testModelInstance>("TestModel", testSchema);
+TestModel.sync({ alter: true })
+ .then((e) => logger.info("[Test Model Sync] Complete"))
+ .catch((e) => logger.error("[Test Model Sync] " + e.message));
+
+export { TestModel };
