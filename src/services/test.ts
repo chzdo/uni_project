@@ -1,6 +1,6 @@
 import { errResponseObjectType, successResponseObjectType } from "../../types";
 import { testModelInstance } from "../../types/sequelize";
-import { create, findOne } from "../controller/sequelize/__config";
+import { create, findOne, count } from "../controller/sequelize/__config";
 import { TestModel } from "../models/sequelize";
 import { processError, processFailedResponse, processResponse } from "../response/__config";
 import { addUser } from "../validators/test";
@@ -11,6 +11,9 @@ async function addNewUSer(body: testModelInstance): Promise<errResponseObjectTyp
  try {
   const { error } = addUser.validate(body);
   if (error) return processFailedResponse(422, error.message, service);
+
+  await count({ id: 1 }, TestModel);
+
   const response = await create(body, TestModel);
   return processResponse(201, response.toJSON());
  } catch (e: unknown) {

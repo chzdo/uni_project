@@ -21,7 +21,7 @@ function processQueryOptions(
  };
 }
 
-function processCountQueryOptions(attributes: Record<string, Array<string>>, options?: options) {
+function processCountQueryOptions(options: options) {
  const processedOptions: Record<symbol | string, any> = options ? processQuery(options) : {};
 
  return {
@@ -200,4 +200,4 @@ function buildQuery(array: Array<string>, queries: string, operator: symbol) {
  };
 }
 
-export { processQueryOptions };
+export { processQueryOptions, processCountQueryOptions };

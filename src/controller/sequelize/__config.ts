@@ -1,6 +1,7 @@
 import Sequelize, { Op, Sequelize as Seq } from "sequelize";
+import { all } from "sequelize/types/lib/operators";
 import { options } from "../../../types";
-import { processQueryOptions } from "./__query";
+import { processQueryOptions, processCountQueryOptions } from "./__query";
 
 async function create(body, model?: Sequelize.ModelCtor<Sequelize.Model>): Promise<Sequelize.Model> {
  return await model.create({ ...body });
@@ -28,12 +29,9 @@ async function findAll(
  return await model.findAll(processedOptions);
 }
 
-async function count(
- options,
- model?: Sequelize.ModelCtor<Sequelize.Model>
-): Promise<{ rows: Sequelize.Model[]; count: number }> {
+async function count(options, model?: Sequelize.ModelCtor<Sequelize.Model>): Promise<number> {
  const processedOptions = processCountQueryOptions(options);
- return await model.findAndCountAll(processedOptions);
+ return await model.count(processedOptions);
 }
 
 async function update(
@@ -42,7 +40,7 @@ async function update(
  model?: Sequelize.ModelCtor<Sequelize.Model>
 ): Promise<Sequelize.Model[]> {
  const processedOptions = processQueryOptions(attributes, options);
- return await model.findAndCountAll;
+ return await model.findAll();
 }
 
 async function softDelete(
@@ -62,4 +60,4 @@ async function hardDelete(
  const processedOptions = processQueryOptions(attributes, options);
  return await model.findAll(processedOptions);
 }
-export { create, findOne, findAll };
+export { create, findOne, findAll, count };
