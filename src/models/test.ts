@@ -1,9 +1,7 @@
+import { testModelInstance } from "../../types/sequelize";
 import { DataTypes } from "sequelize";
-import sequelize from "../../databaseEngine/sequelize";
-import { testModelInstance } from "../../../types/sequelize";
-import { logger } from "../../../utils/winston";
-import * as Sequel from "sequelize";
-
+import Sequelize from "sequelize";
+import { logger } from "../../utils/winston";
 const testSchema = {
  id: {
   type: DataTypes.INTEGER,
@@ -30,18 +28,27 @@ const testSchema = {
   defaultValue: false,
  },
 };
-let TestModel: Sequel.ModelCtor<testModelInstance>;
-try {
- TestModel = sequelize.define<testModelInstance>("testModels", testSchema, {
+
+export function createModel(sequelize: Sequelize.Sequelize): Sequelize.ModelCtor<testModelInstance> {
+ const testModels = sequelize.define<testModelInstance>("testModels", testSchema, {
   tableName: "testModels",
   freezeTableName: true,
  });
-} catch (e) {
- logger.error(e);
+ testModels
+  .sync({ alter: true })
+  .then((e) => logger.info("[Test Model Sync] Complete"))
+  .catch((e) => logger.error("[Test Model Sync] " + e.message));
+
+ return testModels;
 }
+
+/**
+const TestModel: = 
 
 TestModel.sync({ alter: true })
  .then((e) => logger.info("[Test Model Sync] Complete"))
  .catch((e) => logger.error("[Test Model Sync] " + e.message));
-
+console.log("i got to the model");
 export { TestModel };
+
+**/

@@ -1,11 +1,25 @@
 import Sequelize, { Op, Sequelize as Seq } from "sequelize";
-import { options } from "../../../types";
+import { findAttributes, options } from "../../types";
+
+/**
+ *
+ * @param attributes
+ * @param options
+ * @param aggregateOptions
+ * @param pagination
+ * @returns {Sequelize.FindOptions}
+ */
 
 function processQueryOptions(
- attributes: Record<string, Array<string>>,
+ attributes: findAttributes,
  options?: options,
- pagination: { page?: number; limit: number } = { page: 1, limit: 1000 }
+ orderOptions: Array<string> = [],
+ groupOptions = "",
+ pagination: { page?: number; limit: number } = { page: 0, limit: 1000 }
 ): Sequelize.FindOptions {
+ attributes.include = attributes.include ? attributes.include : [];
+ attributes.exclude = attributes.exclude ? attributes.exclude : [];
+
  const processedOptions: Record<symbol | string, any> = options ? processQuery(options) : {};
 
  return {
@@ -17,11 +31,23 @@ function processQueryOptions(
    ...processedOptions,
   },
   offset: pagination.page * pagination.limit,
-  limit: pagination.limit || undefined,
+  limit: pagination.limit,
+  order: [...orderOptions],
+  group: groupOptions,
  };
 }
 
-function processCountQueryOptions(options: options) {
+function processUpdateOptions(options?: options): Sequelize.UpdateOptions {
+ const processedOptions: Record<symbol | string, any> = options ? processQuery(options) : {};
+
+ return {
+  where: {
+   ...processedOptions,
+  },
+ };
+}
+
+function processCountQueryOptions(options: options): Sequelize.FindAndCountOptions {
  const processedOptions: Record<symbol | string, any> = options ? processQuery(options) : {};
 
  return {
@@ -73,7 +99,7 @@ function processQuery(options: options) {
  }
 
  return {
-  [Op.and]: [...[{ ...rest }], ...paramsOptions, ...queryOptions],
+  [Op.and]: [...[{ ...rest }], ...paramsOptions, ...queryOptions, { isDeleted: false }],
  };
 }
 
@@ -91,9 +117,7 @@ function buildOr(value, key): Array<Record<symbol | string, unknown>> {
    orQuery.push(buildLike(vrray, key));
   } else {
    orQuery.push({
-    [key]: {
-     [Op.or]: valueArray,
-    },
+    [key]: vrray,
    });
   }
  }
@@ -141,13 +165,12 @@ function buildLike(value, key) {
 
  return likeQuery;
 }
-// !:, !~, !  id=!2, !6
+
 function buildNot(value: string, key: string): Array<Record<symbol | string, unknown>> {
  const notQuery = [];
  const valueArray = value.split("!");
  valueArray.shift();
  for (const vrray of valueArray) {
-  if (!vrray) continue;
   if (vrray.includes(":")) {
    notQuery.push({ ...buildNotIn(vrray, key) });
   } else if (vrray.includes("~")) {
@@ -167,7 +190,7 @@ function buildNot(value: string, key: string): Array<Record<symbol | string, unk
 
 function buildNotIn(value, key): Record<symbol | string, unknown> {
  const valueArray = value.split(":");
-
+ valueArray.shift();
  return {
   [key]: {
    [Op.notIn]: valueArray,
@@ -192,6 +215,7 @@ function buildNotLike(value, key): Record<symbol | string, unknown> {
  };
 }
 
+/**
 function buildQuery(array: Array<string>, queries: string, operator: symbol) {
  return {
   [queries]: {
@@ -199,5 +223,6 @@ function buildQuery(array: Array<string>, queries: string, operator: symbol) {
   },
  };
 }
+**/
 
-export { processQueryOptions, processCountQueryOptions };
+export { processQueryOptions, processCountQueryOptions, processUpdateOptions };

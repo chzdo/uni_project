@@ -6,7 +6,7 @@ function handle404(req: Request, res: Response, next: NextFunction): void {
  next(responseObject);
 }
 
-function handleError(
+function handleResponse(
  responseObject: errResponseObjectType | any,
  req: Request,
  res: Response,
@@ -20,4 +20,4 @@ function handleError(
  });
 }
 
-export { handle404, handleError };
+export { handle404, handleResponse };

@@ -1,10 +1,12 @@
+import { StringifyOptions } from "querystring";
 import Sequelize, { Op, Sequelize as Seq } from "sequelize";
-import { all } from "sequelize/types/lib/operators";
-import { options } from "../../../types";
-import { processQueryOptions, processCountQueryOptions } from "./__query";
+import { findAttributes, options } from "../../types";
+import { processQueryOptions, processCountQueryOptions, processUpdateOptions } from "./__query";
 
-async function create(body, model?: Sequelize.ModelCtor<Sequelize.Model>): Promise<Sequelize.Model> {
- return await model.create({ ...body });
+// eslint-disable-next-line @typescript-eslint/ban-types
+async function create(body, model?: Sequelize.ModelCtor<Sequelize.Model>): Promise<Record<string, unknown> | object> {
+ const createResponse = await model.create({ ...body });
+ return createResponse.toJSON();
 }
 
 async function createMany(body, model?: Sequelize.ModelCtor<Sequelize.Model>): Promise<Sequelize.Model[]> {
@@ -21,7 +23,7 @@ async function findOne(
 }
 
 async function findAll(
- attributes: Record<string, Array<string>>,
+ attributes: findAttributes,
  options?: options,
  model?: Sequelize.ModelCtor<Sequelize.Model>
 ): Promise<Sequelize.Model[]> {
@@ -35,29 +37,29 @@ async function count(options, model?: Sequelize.ModelCtor<Sequelize.Model>): Pro
 }
 
 async function update(
- attributes: Record<string, Array<string>>,
- options?: options,
+ updateData: Record<string, any>,
+ updateOptions: options,
  model?: Sequelize.ModelCtor<Sequelize.Model>
-): Promise<Sequelize.Model[]> {
- const processedOptions = processQueryOptions(attributes, options);
- return await model.findAll();
-}
-
-async function softDelete(
- attributes: Record<string, Array<string>>,
- options?: options,
- model?: Sequelize.ModelCtor<Sequelize.Model>
-): Promise<Sequelize.Model[]> {
- const processedOptions = processQueryOptions(attributes, options);
- return await model.findAll(processedOptions);
+): Promise<[number, Sequelize.Model[]]> {
+ const options = processUpdateOptions(updateOptions);
+ return await model.update(updateData, options);
 }
 
 async function hardDelete(
  attributes: Record<string, Array<string>>,
  options?: options,
  model?: Sequelize.ModelCtor<Sequelize.Model>
-): Promise<Sequelize.Model[]> {
- const processedOptions = processQueryOptions(attributes, options);
- return await model.findAll(processedOptions);
+): Promise<number> {
+ const processedOptions = processUpdateOptions(options);
+ return await model.destroy(processedOptions);
 }
-export { create, findOne, findAll, count };
+
+async function softDelete(
+ attributes: Record<string, Array<string>>,
+ options?: options,
+ model?: Sequelize.ModelCtor<Sequelize.Model>
+): Promise<[number, Sequelize.Model[]]> {
+ const processedOptions = processUpdateOptions(options);
+ return await model.update({ isDeleted: true }, processedOptions);
+}
+export { create, findOne, findAll, count, update, softDelete, hardDelete };

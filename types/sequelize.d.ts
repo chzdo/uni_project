@@ -1,7 +1,7 @@
 import { Model } from "sequelize";
 
 interface testModelInstance extends Model {
- firstName: boolean;
+ firstName: string;
  otherName: string;
  dob: Date;
  isDeleted: boolean;

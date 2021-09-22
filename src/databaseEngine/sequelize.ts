@@ -1,5 +1,6 @@
 import mysql from "mysql2/promise";
 import { logger } from "../../utils/winston";
+//import "index.ts";
 import * as Sequel from "sequelize";
 import { Sequelize } from "sequelize";
 
