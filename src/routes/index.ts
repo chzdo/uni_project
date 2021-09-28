@@ -1,8 +1,8 @@
 import express from "express";
-import { handle404, handleError } from "../middlewares/routeHandler";
-import routerTest from "./sequelize";
+import { handle404, handleResponse } from "../middlewares/routeHandler";
+import routerTest from "./test";
 const router = express.Router();
-router.use("/sequelize", routerTest);
+router.use("/", routerTest);
 router.use(handle404);
-router.use(handleError);
+router.use(handleResponse);
 export { router };
