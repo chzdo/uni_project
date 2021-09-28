@@ -1,6 +1,8 @@
 import { errResponseObjectType, successResponseObjectType } from "../../types";
 import { testModelInstance } from "../../types/sequelize";
+
 import { create, findOne, count, update, findAll, hardDelete, softDelete } from "../controller/__config";
+
 import { processError, processFailedResponse, processResponse } from "../response/__config";
 import { addUser } from "../validators/test";
 import { Request } from "express";
@@ -30,10 +32,6 @@ async function getTestById(req: Request): Promise<errResponseObjectType | succes
   const { query, params } = req;
 
   const response = await findOne(
-   {
-    include: ["firstName", "id"],
-    exclude: ["otherName", "address", "dob"],
-   },
    {
     query,
     params,
@@ -65,7 +63,7 @@ async function getAllUsers(req: Request): Promise<errResponseObjectType | succes
  try {
   const { params, query } = req;
 
-  const response = await findAll({}, { params, query }, testModels);
+  const response = (await findAll({ params, query }, testModels)).map((value) => value.toJSON());
 
   return processResponse(200, response);
  } catch (e: unknown) {

@@ -1,4 +1,3 @@
-import { StringifyOptions } from "querystring";
 import Sequelize, { Op, Sequelize as Seq } from "sequelize";
 import { findAttributes, options } from "../../types";
 import { processQueryOptions, processCountQueryOptions, processUpdateOptions } from "./__query";
@@ -13,21 +12,13 @@ async function createMany(body, model?: Sequelize.ModelCtor<Sequelize.Model>): P
  return await model.bulkCreate([...body]);
 }
 
-async function findOne(
- attributes: Record<string, Array<string>>,
- options?: options,
- model?: Sequelize.ModelCtor<Sequelize.Model>
-): Promise<Sequelize.Model> {
- const processedOptions = processQueryOptions(attributes, options);
+async function findOne(options?: options, model?: Sequelize.ModelCtor<Sequelize.Model>): Promise<Sequelize.Model> {
+ const processedOptions = processQueryOptions(options);
  return await model.findOne(processedOptions);
 }
 
-async function findAll(
- attributes: findAttributes,
- options?: options,
- model?: Sequelize.ModelCtor<Sequelize.Model>
-): Promise<Sequelize.Model[]> {
- const processedOptions = processQueryOptions(attributes, options);
+async function findAll(options?: options, model?: Sequelize.ModelCtor<Sequelize.Model>): Promise<Sequelize.Model[]> {
+ const processedOptions = processQueryOptions(options);
  return await model.findAll(processedOptions);
 }
 

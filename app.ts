@@ -7,10 +7,9 @@ import { useMorgan } from "./utils/morgan";
 import { router } from "./src/routes/index";
 
 import { logger } from "./utils/winston";
-
 const { PORT } = process.env;
-
 const app = express();
+
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
