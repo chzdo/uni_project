@@ -10,9 +10,11 @@ function processQueryOptions(options: options): {
 } {
  const { population, page, sort, project } = options?.query;
 
- const skip = page > 1 && population ? parseInt(page) * parseInt(population) : 0;
+ const skip = page > 1 && population ? (parseInt(page) - 1) * parseInt(population) : 0;
  const limit = population ? parseInt(population) : Number.MAX_SAFE_INTEGER;
  const projectString = project ? project.split(",").join(" ") : "";
+ const sortAdjusted = sort ? sort.split(",").map((value) => value.split(":")) : [];
+
  delete options.query.page;
  delete options.query.population;
  delete options.query.sort;
@@ -26,7 +28,7 @@ function processQueryOptions(options: options): {
   },
   skip,
   limit,
-  sort,
+  sort: sortAdjusted,
   project: projectString,
  };
 }
