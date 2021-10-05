@@ -4,7 +4,8 @@ import mongoose from "mongoose";
 import { processQueryOptions, processUpdateOptions } from "./__query";
 
 async function create(body, model: mongoose.Model<any>): Promise<mongoose.Model<any>> {
-  const id = (await count({}, model)) + 1;
+ let { id } = (await model.findOne().sort([["_id", "DESC"]])).toJSON();
+ id++;
   return await model.create({ ...body, id, _id: id });
 }
 
