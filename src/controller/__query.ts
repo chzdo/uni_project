@@ -72,6 +72,8 @@ function processQuery(options: options): Record<symbol | string, any> {
     queryBuilder.push(buildRangeQuery(key, value));
    } else if (value.includes("%")) {
     queryBuilder.push(buildLikeQuery(key, value));
+   } else {
+    queryBuilder.push({ [key]: value });
    }
   }
  }
